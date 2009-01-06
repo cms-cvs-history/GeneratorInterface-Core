@@ -42,6 +42,11 @@ namespace edmtest
     return true;
   }
 
+  void MockHadronizer::statistics()
+  {
+     return;
+  }
+  
   const char* MockHadronizer::classname() const
   {
     return "edmtest::MockHadronizer";
