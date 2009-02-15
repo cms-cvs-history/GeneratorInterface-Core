@@ -27,6 +27,11 @@ namespace edmtest
     return true;
   }
 
+  bool MockHadronizer::residualDecay()
+  {
+     return true;
+  }
+  
   bool MockHadronizer::initializeForExternalPartons()
   {
     return true;
@@ -37,7 +42,7 @@ namespace edmtest
     return true;
   }
 
-  bool MockHadronizer::declareStableParticles()
+  bool MockHadronizer::declareStableParticles( const std::vector<int> )
   {
     return true;
   }

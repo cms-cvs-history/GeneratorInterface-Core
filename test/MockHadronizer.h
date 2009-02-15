@@ -4,7 +4,7 @@
 // Hadronizer concept.
 
 #include "FWCore/ParameterSet/interface/ParameterSetfwd.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
 
 namespace HepMC
 {
@@ -23,20 +23,25 @@ namespace edmtest
     bool generatePartonsAndHadronize();
     bool hadronize();
     bool decay();
+    bool residualDecay();
     bool initializeForExternalPartons();
     bool initializeForInternalPartons();
-    bool declareStableParticles();
+    bool declareStableParticles(const std::vector<int>);
     
+    void finalizeEvent() { return; }
     void statistics();
 
     const char* classname() const;
     
+    void resetEvent( const HepMC::GenEvent* ) { return; } 
+
     HepMC::GenEvent* getGenEvent() { return fGenEvent; }
-    const edm::GenInfoProduct& getGenInfoProduct() const { return fGenInfoProduct; }
+    const GenRunInfoProduct& getGenRunInfo() const { return fGenRunInfo; }
+    
   
   private:
     HepMC::GenEvent*     fGenEvent;
-    edm::GenInfoProduct  fGenInfoProduct;
+    GenRunInfoProduct    fGenRunInfo;
   
   };
 }
