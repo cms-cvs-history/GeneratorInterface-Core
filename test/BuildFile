@@ -14,6 +14,6 @@
 </library>
 
 <bin file=TestDriver.cpp name= TestGeneratorInterfaceTestMockHadronizerGeneratorFilter>
-  <flags TEST_RUNNER_ARGS=" /bin/bash GeneratorInterface/CommonInterface/test run_MockHadronizerGeneratorFilter.sh">
+  <flags TEST_RUNNER_ARGS=" /bin/bash run_MockHadronizerGeneratorFilter.sh">
   <use name=FWCore/Utilities>
 </bin>
