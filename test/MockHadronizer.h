@@ -5,6 +5,7 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSetfwd.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 namespace HepMC
 {
@@ -36,11 +37,13 @@ namespace edmtest
     void resetEvent( const HepMC::GenEvent* ) { return; } 
 
     HepMC::GenEvent* getGenEvent() { return fGenEvent; }
+    GenEventInfoProduct* getGenEventInfo() { return fGenEvtInfo; }
     const GenRunInfoProduct& getGenRunInfo() const { return fGenRunInfo; }
     
   
   private:
     HepMC::GenEvent*     fGenEvent;
+    GenEventInfoProduct* fGenEvtInfo;
     GenRunInfoProduct    fGenRunInfo;
   
   };
