@@ -9,9 +9,13 @@
 
 namespace HepMC
 {
-class GenEvent;
+  class GenEvent;
 }
 
+namespace edm
+{
+  class Event;
+}
 
 namespace edmtest
 {
@@ -39,7 +43,8 @@ namespace edmtest
     HepMC::GenEvent* getGenEvent() { return fGenEvent; }
     GenEventInfoProduct* getGenEventInfo() { return fGenEvtInfo; }
     const GenRunInfoProduct& getGenRunInfo() const { return fGenRunInfo; }
-    
+
+    void setEDMEvent(edm::Event &ev) {}
   
   private:
     HepMC::GenEvent*     fGenEvent;
