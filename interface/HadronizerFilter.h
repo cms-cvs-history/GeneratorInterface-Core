@@ -64,6 +64,7 @@ namespace edm
     Hadronizer hadronizer_;
     // gen::ExternalDecayDriver* decayer_;
     Decayer* decayer_;
+    bool fromSource_;
 
   };
 
@@ -75,7 +76,8 @@ namespace edm
   HadronizerFilter<HAD,DEC>::HadronizerFilter(ParameterSet const& ps) :
     EDFilter(),
     hadronizer_(ps),
-    decayer_(0)
+    decayer_(0),
+    fromSource_(true)
   {
     // TODO:
     // Put the list of types produced by the filters here.
@@ -111,7 +113,11 @@ namespace edm
     // get LHE stuff and pass to hadronizer!
     //
     edm::Handle<LHEEventProduct> product;
-    ev.getByLabel("source", product);
+    
+    if ( fromSource_ ) 
+      ev.getByLabel("source", product);
+    else
+      ev.getByLabel("externalLHEProducer", product);
 
     lhef::LHEEvent *lheEvent =
 		new lhef::LHEEvent(hadronizer_.getLHERunInfo(), *product);
@@ -179,21 +185,33 @@ namespace edm
   HadronizerFilter<HAD,DEC>::beginRun(Run& run, EventSetup const& es)
   {
     
+/*
     // init post-generation tools
     // we do it here to mimic the order as it was with beginJob
     //
     if ( decayer_ ) decayer_->init(es);
-    
+*/    
     
     // this is run-specific
     
     // get LHE stuff and pass to hadronizer!
 
-    edm::Handle<LHERunInfoProduct> product;
-    run.getByLabel("source", product);
+    std::vector< edm::Handle<LHERunInfoProduct> > productV;
 
-    hadronizer_.setLHERunInfo( new lhef::LHERunInfo(*product) ) ;
+    run.getManyByType(productV); 
+
+    if ( productV.size() > 1 ) 
+      throw edm::Exception(errors::EventCorruption) 
+        << "More than one LHERunInfoProduct present";
+    else
+      {
+        if ( productV[0].provenance()->moduleLabel() == "externalLHEProducer" ) 
+          fromSource_ = false;
+      }
+
+    hadronizer_.setLHERunInfo( new lhef::LHERunInfo(*productV[0]) ) ;
    
+/*
     if (! hadronizer_.initializeForExternalPartons())
       throw edm::Exception(errors::Configuration) 
 	<< "Failed to initialize hadronizer "
@@ -208,6 +226,7 @@ namespace edm
             << hadronizer_.classname()
             << "\n";
       }
+*/
     
     return true;
   
@@ -243,8 +262,33 @@ namespace edm
 
   template <class HAD, class DEC>
   bool
-  HadronizerFilter<HAD,DEC>::beginLuminosityBlock(LuminosityBlock &, EventSetup const&)
+  HadronizerFilter<HAD,DEC>::beginLuminosityBlock(LuminosityBlock &, EventSetup const& es)
   {
+   
+    if (! hadronizer_.initializeForExternalPartons())
+      throw edm::Exception(errors::Configuration) 
+	<< "Failed to initialize hadronizer "
+	<< hadronizer_.classname()
+	<< " for internal parton generation\n";
+
+    if ( decayer_ )
+    {
+       decayer_->init(es);
+       if ( !hadronizer_.declareStableParticles( decayer_->operatesOnParticles() ) )
+          throw edm::Exception(errors::Configuration)
+            << "Failed to declare stable particles in hadronizer "
+            << hadronizer_.classname()
+	    << " for internal parton generation\n";
+       if ( !hadronizer_.declareSpecialSettings( decayer_->specialSettings() ) )
+          throw edm::Exception(errors::Configuration)
+            << "Failed to declare special settings in hadronizer "
+            << hadronizer_.classname()
+            << "\n";
+    }
+
+
+
+
     return true;
   }
 
